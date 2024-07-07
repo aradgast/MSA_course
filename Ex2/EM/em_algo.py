@@ -15,7 +15,7 @@ class EMAlgo:
         prev_loss = 0
         while loss_diff > self.tol:
             e = self.e_step(data, params)
-            new_params = self.m_step(params, e)
+            new_params = self.m_step(data, e)
             curr_loss = self.calc_loss(data, new_params)
             loss_diff = curr_loss - prev_loss
             prev_loss = curr_loss
@@ -34,8 +34,9 @@ class EMAlgo:
         e /= denomerator
         return e
 
-    def m_step(self):
-        pass
+    def m_step(self, data, e):
+        new_weights = np.mean(e, axis=1)[:, None]
+
 
     def _init_params(self, dim: int):
         weights = np.random.uniform(0, 1, size=(self.mix_number, 1))
