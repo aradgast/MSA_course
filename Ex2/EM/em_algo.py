@@ -13,7 +13,7 @@ class EMAlgo:
         params = self._init_params(data.shape[-1])
         loss_diff = np.inf
         prev_loss = 0
-        while loss_diff > self.tol:
+        while np.abs(loss_diff) > self.tol:
             e = self.e_step(data, params)
             new_params = self.m_step(data, e)
             curr_loss = self.calc_loss(data, new_params)
@@ -24,11 +24,18 @@ class EMAlgo:
 
         return params, loss_list
 
+    def calc_loss(self, data, params):
+        loss = 0
+        for key, val in params.items():
+            loss += val.get("weights") * multivariate_normal.pdf(data, mean=val.get("mean"), cov=val.get("cov"))
+        loss = np.sum(np.log(loss))
+        return loss
+
     def e_step(self, data, params):
         denomerator = 0
         e = np.zeros((self.mix_number, data.shape[0]))
         for key, val in params.items():
-            numerator = val.get("weight") * multivariate_normal.pdf(data, loc=val.get("mean"), scale=val.get("cov"))
+            numerator = val.get("weights") * multivariate_normal.pdf(data, mean=val.get("mean"), cov=val.get("cov"))
             denomerator += numerator
             e[key] = numerator
         e /= denomerator
@@ -36,6 +43,18 @@ class EMAlgo:
 
     def m_step(self, data, e):
         new_weights = np.mean(e, axis=1)[:, None]
+
+        new_means = np.zeros((self.mix_number, data.shape[-1]))
+        for m in range(self.mix_number):
+            new_means[m] = np.sum(e[m][:, None] * data, axis=0) / np.sum(e[m])
+        new_covs = np.zeros((self.mix_number, data.shape[-1], data.shape[-1]))
+        for m in range(self.mix_number):
+            diff = data - new_means[m]
+            new_covs[m] = np.matmul((e[m][:, None] * diff).T, diff) / np.sum(e[m])
+
+        new_params = {k: {"weights": w, "mean": mu, "cov": sig} for k, (w, mu, sig) in enumerate(zip(new_weights, new_means, new_covs))}
+        return new_params
+
 
 
     def _init_params(self, dim: int):

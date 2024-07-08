@@ -28,4 +28,3 @@ class Samples:
         plt.grid()
         plt.tight_layout()
         # plt.savefig(f'Data Generation - {N} points.jpeg')
-        plt.show()
