@@ -23,7 +23,9 @@ class Samples:
 
     def plot_samples(self):
         plt.figure(figsize=(11, 8))
-        plt.scatter(self.data[:, 0], self.data[:, 1], c=self.labels)
+        plt.scatter(self.data[:, 0], self.data[:, 1], label="Data", s=10)
+        # decrese the size of each point
+
         plt.title(f'Data Generation - {self.data.shape[0]} points')
         plt.grid()
         plt.tight_layout()

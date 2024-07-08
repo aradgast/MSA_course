@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def ellips_plot_2d(m, C, binnum, c):
+def ellips_plot_2d(m, C, binnum, c, label=None):
     """
     This function plots a 2-dimensional ellipsoid corresponding to a 2-dimensional Gaussian
     random vector.
@@ -30,4 +30,9 @@ def ellips_plot_2d(m, C, binnum, c):
     y = np.sqrt(evals[1]) * np.sin(theta)
     R = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
     x, y = np.dot(R, np.array([x, y]))
-    plt.plot(x + m[0], y + m[1], c)
+    plt.plot(x + m[0], y + m[1], c, label=label)
+    if label is not None:
+        plt.plot(m[0], m[1], 'kx', c=c, label=label + " Mean")
+    else:
+        plt.plot(m[0], m[1], 'kx', c=c)
+
