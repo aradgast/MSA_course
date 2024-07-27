@@ -10,6 +10,12 @@ def generate_data(N):
     Z = np.hstack((X, Y))
     return Z
 
+def get_det(matrix):
+    matrix = np.atleast_2d(matrix)
+    if matrix.shape[0] == 1:
+        return np.abs(matrix[0])
+    return np.linalg.det(matrix)
+
 
 # Function to whiten data
 def whiten_data(Z):
@@ -67,9 +73,9 @@ def glrt_independence(X, Y):
     cov_Y = np.cov(Y, rowvar=False)
     cov_XY = np.cov(np.hstack((X, Y)), rowvar=False)
 
-    log_det_cov_X = np.log(np.linalg.det(cov_X))
-    log_det_cov_Y = np.log(np.linalg.det(cov_Y))
-    log_det_cov_XY = np.log(np.linalg.det(cov_XY))
+    log_det_cov_X = np.log(get_det(cov_X))
+    log_det_cov_Y = np.log(get_det(cov_Y))
+    log_det_cov_XY = np.log(get_det(cov_XY))
 
     glrt_statistic = (N - (p + q + 3) / 2) * (log_det_cov_X + log_det_cov_Y - log_det_cov_XY)
     return glrt_statistic
@@ -85,7 +91,7 @@ def calculate_glrt_p_value(glrt_statistic, p, q):
 # Main function to run the analysis
 def main():
     N = 1000
-    P = 100
+    P = 1000
     Z = generate_data(N)
     X, Y = Z[:, 0].reshape(-1, 1), Z[:, 1].reshape(-1, 1)
     Z_whitened = whiten_data(Z)
